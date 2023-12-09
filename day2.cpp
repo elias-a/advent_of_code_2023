@@ -42,34 +42,32 @@ int main() {
     int invalidGame = false;
     vector<string> data = split(line, ":");
     int gameId = stoi(trim(split(trim(data[0]), " ")[1]));
-    vector<string> games = split(trim(data[1]), ";");
+    vector<string> groups = split(trim(data[1]), ";");
+    unordered_map<string, int> colors = {
+      { "blue", 0 },
+      { "red", 0 },
+      { "green", 0 },
+    };
 
-    for (auto game = games.begin(); game != games.end(); game++) {
-      unordered_map<string, int> colors = {
-        { "blue", 0 },
-        { "red", 0 },
-        { "green", 0 },
-      };
-
-      vector<string> draws = split(trim(*game), ",");
+    for (auto group = groups.begin(); group != groups.end(); group++) {
+      vector<string> draws = split(trim(*group), ",");
       for (auto draw = draws.begin(); draw != draws.end(); draw++) {
         vector<string> strings = split(trim(*draw), " ");
         int count = stoi(trim(strings[0]));
         string color = trim(strings[1]);
 
-        colors[color] += count;
-      }
-
-      for (auto it = colors.begin(); it != colors.end(); it++) {
-        if (it->second > limits[it->first]) {
-          invalidGame = true;
+        if (count > colors[color]) {
+          colors[color] = count;
         }
       }
     }
 
-    if (!invalidGame) {
-      sum += gameId;
+    int power = 1;
+    for (auto it = limits.begin(); it != limits.end(); it++) {
+      power *= colors[it->first];
     }
+
+    sum += power;
   }
 
   inputFile.close();
